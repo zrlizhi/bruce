@@ -1,0 +1,163 @@
+package com.hj.app.wx;
+
+import java.security.AlgorithmParameters;
+import java.security.Security;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.hj.app.model.ResultData;
+import com.hj.app.utils.Constants;
+import com.hj.app.utils.PostHttp;
+import com.jfinal.core.Controller;
+
+import cn.hutool.core.codec.Base64;
+
+/**
+ * 
+ * @author hujian 微信授权或获取用户信息
+ *
+ */
+public class WxController extends Controller {
+
+	// 获取openid
+	public void getWxOpenId() {
+
+		String code = getPara("code");
+		
+		System.out.println("code==="+code);
+		ResultData resultData = new ResultData();
+		
+		if( null == code || 0 == code.length() ){
+			resultData.setCode(-1);
+			resultData.setMsg("请传code!");
+			renderJson(resultData);
+			return;
+		}
+														
+		Map<String, String> requestUrlParam = new HashMap<String, String>();
+		requestUrlParam.put("appid", Constants.APP_ID); // 开发者设置中的appId
+		requestUrlParam.put("secret", Constants.APPSECRET); // 开发者设置中的appSecret
+		requestUrlParam.put("js_code", code); // 小程序调用wx.login返回的code
+		requestUrlParam.put("grant_type", "authorization_code"); // 默认参数
+		// authorization_code
+		// 发送post请求读取调用微信 https://api.weixin.qq.com/sns/jscode2session
+		// 接口获取openid用户唯一标识
+		JSONObject jsonObject = JSON.parseObject(PostHttp.sendPost(Constants.WX_GET_OPENID_URL, requestUrlParam));
+
+		if (null == jsonObject.getString("openid")) {
+			resultData.setCode(-1);
+			resultData.setMsg("无法获取openid");
+			renderJson(resultData);
+			return;
+		}
+
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("session_key", jsonObject.getString("session_key"));
+		map.put("openId", jsonObject.getString("openid"));
+
+		resultData.setCode(0);
+		resultData.setMsg("获取成功！");
+		resultData.setResultData(map);
+		
+		renderJson(resultData);
+		return;
+
+	}
+
+	/**
+	 * 解密用户敏感数据获取用户信息
+	 * 
+	 * @author huajian
+	 * @param sessionKey
+	 *            数据进行加密签名的密钥
+	 * @param encryptedData
+	 *            包括敏感数据在内的完整用户信息的加密数据
+	 * @param iv
+	 *            加密算法的初始向量
+	 * @return
+	 */
+	public void getWxUserInfo() {
+
+		String encryptedData = getPara("encryptedData");
+
+		String sessionKey = getPara("sessionKey");
+
+		String iv = getPara("iv");
+
+		ResultData resultData = new ResultData();
+
+		if( null == encryptedData || null == sessionKey || null == iv ){  //校验参数
+			resultData.setCode(-1);
+			resultData.setMsg("获取失败！");
+			renderJson(resultData);
+			return;
+		}
+		
+		String handleResultData = encryptedHandle(encryptedData, sessionKey, iv);  //解密处理
+
+		if (null == handleResultData) {
+			resultData.setCode(-1);
+			resultData.setMsg("获取失败！");
+			renderJson(resultData);
+			return;
+		}
+
+		resultData.setCode(0);
+		resultData.setMsg("获取成功！");
+		resultData.setResultData(handleResultData);
+
+		renderJson(resultData);
+		return;
+	}
+
+	private String encryptedHandle(String encryptedData, String sessionKey, String iv) {  //解密用户信息
+
+		try {
+			// 被加密的数据
+			byte[] dataByte = Base64.decode(encryptedData);
+			// 加密秘钥
+			byte[] keyByte = Base64.decode(sessionKey);
+			// 偏移量
+			byte[] ivByte = Base64.decode(iv);
+
+			// 如果密钥不足16位，那么就补足. 这个if 中的内容很重要
+			int base = 16;
+			if (keyByte.length % base != 0) {
+				int groups = keyByte.length / base + (keyByte.length % base != 0 ? 1 : 0);
+				byte[] temp = new byte[groups * base];
+				Arrays.fill(temp, (byte) 0);
+				System.arraycopy(keyByte, 0, temp, 0, keyByte.length);
+				keyByte = temp;
+			}
+
+			Security.addProvider(new BouncyCastleProvider());
+			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
+			SecretKeySpec spec = new SecretKeySpec(keyByte, "AES");
+			AlgorithmParameters parameters = AlgorithmParameters.getInstance("AES");
+			parameters.init(new IvParameterSpec(ivByte));
+			cipher.init(Cipher.DECRYPT_MODE, spec, parameters);// 初始化
+			byte[] resultByte = cipher.doFinal(dataByte);
+
+			if (null != resultByte && resultByte.length > 0) {
+				return new String(resultByte, "UTF-8");
+			}
+			return null;
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+
+	}
+	
+
+}

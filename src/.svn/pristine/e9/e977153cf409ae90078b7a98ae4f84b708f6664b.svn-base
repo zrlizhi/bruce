@@ -1,0 +1,41 @@
+package com.hj.app.common.mapping;
+
+import com.hj.app.manage.varietys.model.VarietysModel;
+import com.hj.app.mobile.merchant.card.model.CardModel;
+import com.hj.app.mobile.merchant.produce.model.ProduceModel;
+import com.hj.app.mobile.merchant.shop.model.ShopModel;
+import com.hj.app.mobile.users.model.MUserModel;
+import com.jfinal.kit.PropKit;
+import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
+import com.jfinal.plugin.activerecord.IDataSourceProvider;
+import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
+
+public class BruceMapping extends ActiveRecordPlugin {
+
+	
+	public BruceMapping(IDataSourceProvider dataSourceProvider) {
+		super(dataSourceProvider);
+		// TODO Auto-generated constructor stub
+		init();
+		addMapping();
+	}
+	
+	//初始化数据源配置
+	private void init(){
+		//orm映射 配置ActiveRecord插件
+		setShowSql(PropKit.getBoolean("devMode"));
+		setDialect(new MysqlDialect());
+	}
+
+	//添加映射关系
+	private void addMapping(){
+		
+		addMapping("app_user", MUserModel.class);//手机用户
+		addMapping("mer_card", CardModel.class);//明信片
+		addMapping("shop", ShopModel.class);//店铺信息
+		addMapping("produce", ProduceModel.class);//产品信息
+		
+		addMapping("varietys",VarietysModel.class); //经营种类
+	}
+	
+}

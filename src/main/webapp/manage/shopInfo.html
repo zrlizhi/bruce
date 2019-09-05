@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" type="text/css" href="/bruce/theme/layui/css/layui.css" media="all">
+<style>
+  p{
+    width:90%;
+    margin:10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="demoTable" style="margin:5px;font-size:20px;">
+  <p>店铺详情</p>
+</div>
+#if(state == 1)
+<p><button class="layui-btn" onclick="updateObj(0)">审核通过</button> <button class="layui-btn layui-btn-warm"  onclick="openObj(2)">审核不通过</button></p>
+#end
+<table class="layui-table" >
+   <tr>
+      <td>编号：#(info.shopInfo.shopnum)</td>
+      <td>店铺名称：#(info.shopInfo.shop_name)</td>
+   </tr>
+   <tr>
+      <td>联系人：#(info.shopInfo.contact_name)</td>
+      <td>电话：#(info.shopInfo.contact_tel)</td>
+   </tr>
+   <tr>
+      <td>收藏数：#(info.shopInfo.collects)</td>
+      <td>浏览数：#(info.shopInfo.views)</td>
+   </tr>
+   <tr>
+      <td>经营品种：#(info.shopInfo.variety)</td>
+      <td>地址：#(info.shopInfo.shop_addr)</td>
+   </tr>
+   
+   <tr>
+      <td>简介：#(info.shopInfo.shop_introduce)</td>
+      <td>日期：#(info.shopInfo.addDate)</td>
+   </tr>
+   
+    <tr>
+    <td>营业执照：<img onclick="imgInfo('#(info.shopInfo.license)')" src="/bruce/upload/#(info.shopInfo.license)" width="150px" height="150px"/></td>
+    <td></td>
+ </tr>
+</table>
+<p style="margin-top:16px;">产品列表：</p>
+<table class="layui-table" >
+   <thead>
+      <tr>
+         <td>产品名称</td>
+         <td>等级</td>
+         <td>产地</td>
+         <td>规格</td>
+         <td>分类</td>
+         <td>观看数</td>
+         <td>日期</td>
+      </tr>
+   </thead>
+   #for(info : info.produces)
+   <tr>
+      <td>#(info.pro_name)</td>
+      <td>#(info.level)</td>
+      <td>#(info.place)</td>
+      <td>#(info.spec)</td>
+      <td>#(info.classify)</td>
+      <td>#(info.views)</td>
+      <td>#(info.addDate)</td>
+   </tr>
+   #end
+</table>
+<script src="/bruce/theme/js/jquery-1.8.3.min.js"></script>
+<script src="/bruce/theme/layer/layer.js"></script>
+<script type="text/javascript">
+  var index;
+  function imgInfo(url){
+	  layer.open({
+		  type: 1,
+		  title:'',
+		  area: ['500px', '500px'], //宽高
+		  content: "<img src='/bruce/upload/"+url+"' />"
+		});
+  }
+
+  function openObj(state){
+	var StrCtn = "";
+  	StrCtn +="<p><textarea id='contentLay' placeholder='请输入内容' class='layui-textarea'></textarea></p>";
+  	StrCtn +="<p style='text-align:center;'><button class='layui-btn' onclick=updateObj('"+state+"');>确认不通过</button></p>";
+  	index = layer.open({
+	   	  title:'意见内容',
+   		  type: 1,
+   		  area: ['420px', '300px'], //宽高
+   		  content: StrCtn
+   		});
+  }
+  function updateObj(state){
+
+	  var str = (state == 0) ? "店铺信息审核通过！" : $("#contentLay").val();
+	  
+	  $.ajax({ 
+			url: "/bruce/pending/update", 
+			dataType: 'json', 
+			data:{
+				id:'#(pid)',
+				state:state,
+				content:str
+			},
+			success: function(result){
+				layer.msg(result.msg);
+				layer.close(index);
+	        }
+		});
+  }
+</script>
+  
+</body>
+</html>

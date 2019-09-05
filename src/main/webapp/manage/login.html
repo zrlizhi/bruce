@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>木业圈.后台登录</title>
+<style type="text/css">
+   body{
+      background-color:#EBEEF1;
+   }
+   .itemLay{
+      height: 350px;
+      width: 400px;
+      background-color:#ffffff;
+   }
+   .boxLay{
+      width:100%;
+      height:100vh;
+      display: flex;
+      display: -webkit-flex;
+      align-items:center;
+      justify-content:center;
+   }
+   p{
+     text-align:center;
+     margin-top:16px;
+   }
+   .title{
+      font-size:25px;
+      font-weight:bold;
+      
+   }
+   
+   input{
+     height:30px;
+     width:70%;
+     padding:5px;
+   }
+   button{
+     border:0;
+     width:200px;
+     height:40px;
+     cursor:pointer;
+     line-height:40px;
+     color:#ffffff;
+     background-color:#3399cc;
+   }
+   .setmargin{
+      margin-top:30px;
+   }
+</style>
+  
+</head>
+<body>
+  <div class="boxLay">
+	  <div class="itemLay">
+	       <p class="title">木业圈后台.登录</p>
+	       <p class="setmargin"><input id="userName" type="text" placeholder="输入账号..."/></p>
+	       <p><input type="password" id="password" placeholder="输入密码..."/></p>
+	       <p class="setmargin"><button onclick="loginObj();">登录</button></p>
+	   </div>
+  </div>
+  <script src="/bruce/theme/js/jquery-1.8.3.min.js"></script>
+  <script src="/bruce/theme/layer/layer.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+	   if( 0 == localStorage.isLogin ){
+           location.href = "/bruce/manage/index";
+	   }
+	});
+    function loginObj(){
+    	if( "" == $("#userName").val()){
+    		layer.msg('请输入用户名!');
+    		return;
+        }
+    	if( "" == $("#password").val()){
+    		layer.msg("请输入密码!");
+    		return;
+        }
+
+    	$.ajax({ 
+    		url: "/bruce/users/login", 
+    		dataType: 'json', 
+    		data:{
+    			userName:$("#userName").val(),
+    			password:$("#password").val()
+    		},
+    		success: function(result){
+    			layer.msg(result.msg);
+    			localStorage.isLogin = 0;
+    			localStorage.userName = result.resultData;
+    			location.href = "/bruce/manage/index";
+            }
+    	});
+    }
+  </script>
+    
+</body>
+</html>

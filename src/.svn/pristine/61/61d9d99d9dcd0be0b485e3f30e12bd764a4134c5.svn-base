@@ -1,0 +1,38 @@
+package com.hj.app.mobile.merchant.shop.controller;
+
+import com.hj.app.mobile.merchant.shop.po.ShopPo;
+import com.hj.app.mobile.merchant.shop.service.IShopService;
+import com.hj.app.mobile.merchant.shop.service.imp.ShopService;
+import com.jfinal.core.Controller;
+
+/**
+ * 店铺信息
+ * @author huajian
+ *
+ */
+public class ShopController extends Controller {
+
+	private IShopService shopService = new ShopService();
+	
+	public void saveOrUpdateShopMsg(){
+		
+		ShopPo shopPo = new ShopPo();
+		shopPo.setId(getPara("openid"));
+		shopPo.setShop_img(getPara("shop_img"));
+		shopPo.setShop_name(getPara("shop_name"));
+		shopPo.setContact_name(getPara("contact_name"));
+		shopPo.setContact_tel(getPara("contact_tel"));
+		shopPo.setShop_addr(getPara("shop_addr"));
+		shopPo.setVariety(getPara("variety"));
+		shopPo.setShop_introduce(getPara("shop_introduce"));
+		shopPo.setLicense(getPara("license"));
+		shopPo.setGoods_ids(getPara("goods_ids"));
+		
+		renderJson(shopService.saveOrUpdateShopMsg(shopPo));
+	}
+	
+	public void queryShopInfo(){
+		
+		renderJson(shopService.queryShopInfo(getPara("openid")));
+	}
+}

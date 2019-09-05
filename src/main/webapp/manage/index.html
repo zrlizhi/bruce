@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>木业圈后台管理</title>
+  <link rel="stylesheet" href="/bruce/theme/layui/css/layui.css">
+  <link rel="stylesheet" type="text/css" href="/bruce/theme/font/css/font-awesome.min.css">
+  <style type="text/css">
+      .frameLay{
+          height:calc(90vh);
+          scrolling:no;
+       }
+       a{
+         cursor:pointer;
+       }
+   </style>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo">尊木汇.木业圈后台管理</div>
+    <!-- 头部区域（可配合layui已有的水平导航） -->
+    <ul class="layui-nav layui-layout-left">
+      <li class="layui-nav-item"><a href="">控制台</a></li>
+      <li class="layui-nav-item"><a href="">商品管理</a></li>
+      <li class="layui-nav-item"><a href="">用户</a></li>
+      <li class="layui-nav-item">
+        <a href="javascript:;">其它系统</a>
+        <dl class="layui-nav-child">
+          <dd><a href="">邮件管理</a></dd>
+          <dd><a href="">消息管理</a></dd>
+          <dd><a href="">授权管理</a></dd>
+        </dl>
+      </li>
+    </ul>
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+                    <label id="uname"></label>
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="">基本资料</a></dd>
+          <dd><a href="">安全设置</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item"><a onclick="exitObj();">退了</a></li>
+    </ul>
+  </div>
+  
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree">
+        <li class="layui-nav-item layui-nav-itemed">
+          <a class="" href="javascript:;"><i class="fa fa-navicon"></i>&nbsp;&nbsp;所有模块</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:viewInfo('/bruce/manage/manage');">首页</a></dd>
+            <dd><a href="javascript:viewInfo('/bruce/manage/customer');">企业注册列表</a></dd>
+            <dd><a href="javascript:viewInfo('/bruce/manage/pending');">待审核列表</a></dd>
+            <dd><a href="javascript:viewInfo('/bruce/manage/shops');">店铺列表</a></dd>
+            <dd><a href="javascript:viewInfo('/bruce/manage/produces');">产品列表</a></dd>
+            <dd><a href="javascript:viewInfo('/bruce/manage/activesList');">动态列表</a></dd>
+            <dd><a onclick="viewObj();">用户列表</a></dd>
+           	<dd><a onclick="javascript:viewInfo('/bruce/manage/orders')">订单列表</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:;"><i class="fa fa-edit"></i>&nbsp;&nbsp;基本信息</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:viewInfo('/bruce/manage/scrollImgs?noCache=Math.random()');">首页滚动图片</a></dd>
+            <dd style="display:none;"><a href="javascript:viewInfo('/bruce/manage/homeVarList?noCache=Math.random()');">首页品种</a></dd>
+            <dd><a href="javascript:viewInfo('/bruce/manage/varietys?noCache=Math.random()');">经营品种</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item">
+          <a class="" href="javascript:;"><i class="fa fa-newspaper-o"></i>&nbsp;&nbsp;新闻管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:viewInfo('/bruce/manage/addNews?noCache=Math.random()');">发布新闻</a></dd>
+            <dd><a href="javascript:viewInfo('/bruce/manage/newsList?noCache=Math.random()');">新闻列表</a></dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <div>
+        <iframe id="menuframeLay" class="frameLay" name="frameLay" scrolling="auto" seamless="seamless" width="100%" frameborder="0" src="/bruce/manage/manage"></iframe>
+    </div>
+  </div>
+  
+  <div class="layui-footer">
+    <!-- 底部固定区域 -->
+    © zmhpark.com - 上海福人投资集团.尊木汇园区.木业圈
+  </div>
+</div>
+<script src="/bruce/theme/layui/layui.js"></script>
+<script src="/bruce/theme/layer/layer.js"></script>
+<script src="/bruce/theme/js/jquery-1.8.3.min.js"></script>
+<script src="/bruce/theme/js/controller.js"></script>
+<script>
+//JavaScript代码区域
+if( 0 != localStorage.isLogin ){
+    location.href = "/bruce/manage/login";
+}
+
+$("#uname").text(localStorage.userName);
+layui.use('element', function(){
+  var element = layui.element;
+  
+});
+
+function viewObj(){
+	if( 'admin' != localStorage.userName ){
+		alert("无权限!");
+		return;
+	}
+	$("#menuframeLay").attr("src","/bruce/manage/usersList");
+	
+}
+
+function exitObj(){
+
+	localStorage.isLogin = -1;
+	location.href = "/bruce/manage/login";
+}
+</script>
+</body>
+</html>

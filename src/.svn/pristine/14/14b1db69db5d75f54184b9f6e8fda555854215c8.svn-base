@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link rel="stylesheet" type="text/css" href="/bruce/theme/layui/css/layui.css">
+  <style>
+       input {
+         height:35px;
+         border-radius:5px;
+         border:0;
+         color:black;
+         padding-left:10px;
+         padding-right:10px;
+         border:1px solid #b3b2b2;
+       }
+       
+       button{
+         margin-left:20px;
+         cursor:pointer;
+       }
+	   
+    </style>
+</head>
+<body>
+ <table style="margin-top:10px;margin-bottom:10px;">
+  <tr>
+     <td style='padding-left:10px;'><button type="button" class="layui-btn" onclick="addObj('0','');">&nbsp;&nbsp;添加经营品种&nbsp;&nbsp;</button></td>
+  </tr>
+ </table>
+<table class="layui-table">
+ <thead>
+   <tr>
+     <th>名称</th>
+     <th>操作</th>
+  </tr>
+ </thead>
+<tbody id="listLay">
+
+</tbody>
+</table>
+<script src="/bruce/theme/js/jquery-1.8.3.min.js"></script>
+<script src="/bruce/theme/layer/layer.js"></script>
+<script type="text/javascript">
+var index;
+$(document).ready(function(){
+	getData();
+});
+function getData(){
+	$.ajax({ 
+		url: "/bruce/var/queryVarietys", 
+		dataType: 'json', 
+		success: function(result){
+			var obj = JSON.parse(result);
+			var str="";
+			for(var i=0;i<obj.length;i++){
+				str+="<tr>";
+				str+="<td>";
+				str+="&nbsp;&nbsp;&nbsp;"+obj[i].vname+"";
+				str+="</td>";
+				str+="<td><button type='button' class='layui-btn layui-btn-normal layui-btn-sm' onclick=addObj('"+obj[i].id+"','"+obj[i].vname+"')>&nbsp;&nbsp;编辑&nbsp;&nbsp;</button>&nbsp;&nbsp;<button type='button' class='layui-btn layui-btn-warm layui-btn-sm' onclick=delObj('"+obj[i].id+"')>&nbsp;&nbsp;删除&nbsp;&nbsp;</button></td>"
+				str+="</tr>"
+			}
+		   $("#listLay").empty();
+           $("#listLay").append(str);
+           
+        }
+	});
+}
+
+function addObj(id,vname){
+	var contentStr="<p style='height:50px;padding-left:10px;margin-top:20px;'><label style='color:black;'>种类名称：</label><input id='vname' type='text' value='"+vname+"' placeholder='输入种类名称' /></p>";
+		contentStr+="<p style='padding-left:25%;'><button type='button' class='layui-btn' onclick=addOrUpdateVar('"+id+"')>确认保存</button></p>";
+    index=layer.open({
+      type: 1,
+      area: ['400px', '200px'],
+      shadeClose: true, //点击遮罩关闭
+      content: contentStr
+    });
+}
+
+function addOrUpdateVar(id){
+	$.ajax({ 
+		url: "/bruce/var/addOrUpdateVar", 
+		dataType: 'json', 
+		data:{
+			vname:$("#vname").val(),
+			id:id
+		},
+		success: function(result){
+			layer.msg(result.msg);
+			layer.close(index);
+			getData();
+		  
+        }
+	});
+}
+
+function delObj(id){
+	$.ajax({ 
+		url: "/bruce/var/deleteVarietys", 
+		dataType: 'json', 
+		data:{
+			id:id
+		},
+		success: function(result){
+			layer.msg(result.msg);
+			layer.close(index);
+			getData();
+		  
+        }
+	});
+}
+</script>
+  
+</body>
+</html>

@@ -1,0 +1,25 @@
+package com.hj.app.front.login;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
+
+import com.jfinal.core.Controller;
+
+public class LoginController extends Controller{
+
+	//登录
+	public void loginIn(){
+		
+		SecurityUtils.getSecurityManager().logout(SecurityUtils.getSubject());
+		//登录后存放进shiro token  
+        UsernamePasswordToken token = new UsernamePasswordToken("", "");  
+        Subject subject = SecurityUtils.getSubject();  
+        subject.login(token); 
+	}
+	
+	//退出登录
+	public void loginOut(){
+		
+	}
+}

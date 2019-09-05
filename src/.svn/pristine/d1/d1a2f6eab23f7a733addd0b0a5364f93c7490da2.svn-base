@@ -1,0 +1,29 @@
+package com.hj.app.manage.varietys.po;
+
+import java.io.Serializable;
+
+public class VarietysPo implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private int id;
+	private String vname;
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getVname() {
+		return vname;
+	}
+	public void setVname(String vname) {
+		this.vname = vname;
+	}
+	
+	
+}

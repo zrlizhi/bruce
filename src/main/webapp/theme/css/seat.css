@@ -1,0 +1,48 @@
+body{
+	background-color: #ffcc99;
+	margin:0;
+	padding:0;
+}
+
+ul{
+	margin: 0;
+	padding:0;
+	margin-top: 16px;
+}
+
+ul li{
+	
+	list-style: none;
+	height:30px;
+	
+}
+
+.setCenter{
+	text-align: center;
+}
+
+.mainLay{
+	text-align: center;
+	padding-top:10vw;
+}
+
+input{
+	
+	height: 35px;
+	width:80vw;
+	text-align: center;
+}
+
+button{
+	width:120px;
+	height:40px;
+	background-color: #ff6600;
+	border:0px;
+	color: white;
+	cursor: pointer;
+	margin-top: 16px;
+}
+.header{
+	color: #ff6600;
+	height:40px;
+}

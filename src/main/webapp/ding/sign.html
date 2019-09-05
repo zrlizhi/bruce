@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/bruce/theme/layui/css/layui.css">
+<style>
+  body{
+    margin:5px;
+  }
+</style>
+</head>
+<body>
+
+<p style="margin-top:16px;"><h2>录入签到信息</h2></p>
+<div class="layui-form-item" style="margin-top:30px;">
+   <input type="text" id="nickName" name="nickName" lay-verify="nickName" autocomplete="off" placeholder="请输入签到人名称" class="layui-input">
+</div>
+<div class="layui-form-item" style="margin-top:30px;">
+   <input type="text" id="groupName" name="groupName" lay-verify="groupName" autocomplete="off" placeholder="请输入分组" class="layui-input">
+</div>
+<div class="layui-form-item" style="margin-top:30px;">
+   <input type="text" id="host" name="host" lay-verify="host" autocomplete="off" placeholder="请输入主持人" class="layui-input">
+</div>
+<div class="layui-form-item" style="margin-top:30px;">
+   <input type="text" id="signMsg" name="signMsg" lay-verify="signMsg" autocomplete="off" placeholder="请输入签到成功提示信息" class="layui-input">
+</div>
+<div class="layui-form-item" style="margin-top:30px;">
+   <input type="text" id="desc" name="desc" lay-verify="desc" autocomplete="off" placeholder="请输入描述" class="layui-input">
+</div>
+
+<p style="text-align: center;margin-top:16px;">
+   <button id="addBtn" onclick="defineObj();" class="layui-btn layui-btn-lg" style="width:20%;" >确认发布</button>
+   <button id="excelBtn" onclick="viewExcel();" class="layui-btn layui-btn-warm layui-btn-lg" style="width:20%;" >EXCEL导入</button>
+</p>
+
+<script src="/bruce/theme/layui/layui.js"></script>
+<script src="/bruce/theme/layer/layer.js"></script>
+<script src="/bruce/theme/js/jquery-1.8.3.min.js"></script>
+
+<script type="text/javascript">
+
+function defineObj(){
+	 if(0 == $("#nickName").val().length){
+   	  layer.msg("请输入签到人名称！");
+        return;
+     }
+     if(0 == $("#groupName").val().length){
+   	  layer.msg("请输入分组名称！");
+        return;
+     }
+     if(0 == $("#host").val().length){
+   	  layer.msg("请输入主持人！");
+        return;
+     }
+     if(0 == $("#signMsg").val().length){
+   	  layer.msg("请输入签到成功提示信息！");
+        return;
+     }
+     if(0 == $("#desc").val().length){
+   	  layer.msg("请输入描述！");
+        return;
+     }
+     
+     var index2 = layer.load(0, {shade: false});
+	  $.ajax({ 
+			url: "/bruce/ding/addSignMsg", 
+			dataType: 'json', 
+			data:{
+				nickName:$("#nickName").val(),
+				groupName:$("#groupName").val(),
+				host:$("#host").val(),
+				signMsg:$("#signMsg").val(),
+				desc:$("#desc").val()
+			},
+			success: function(result){
+				layer.msg(result.msg);
+				layer.close(index2);
+	        }
+		});
+}
+
+function viewExcel(){
+	location.href="/bruce/ding/jumpHtml";
+}
+
+
+</script>
+  
+</body>
+</html>

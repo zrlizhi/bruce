@@ -1,0 +1,51 @@
+package com.hj.app.common.routes;
+
+import com.hj.app.common.error.ErrorController;
+import com.hj.app.common.file.FileController;
+import com.hj.app.index.IndexController;
+import com.hj.app.manage.index.ManageController;
+import com.hj.app.manage.varietys.controller.VarietysController;
+import com.hj.app.mobile.merchant.card.controller.CardController;
+import com.hj.app.mobile.merchant.produce.controller.ProduceController;
+import com.hj.app.mobile.merchant.shop.controller.ShopController;
+import com.hj.app.mobile.users.controller.MUserController;
+import com.hj.app.wx.WxController;
+import com.jfinal.config.Routes;
+
+public class BruceRoutes {
+
+	public BruceRoutes(Routes me) {
+
+		addRoutes(me);   // 前端
+		addManageRoutes(me);  // 管理后台
+		addMobileRoutes(me);  // 手机端
+	}
+
+	
+	private void addRoutes(Routes me) {  // 前端
+
+		me.setBaseViewPath("/views");
+		me.add("/", IndexController.class);
+		me.add("/file", FileController.class); //文件管理
+		
+		me.add("/error", ErrorController.class);    // 处理异常情况
+
+	}
+
+	private void addManageRoutes(Routes me) {  // 管理后台
+
+		me.add("/manage", ManageController.class);   // 后台首页
+		me.add("/var",VarietysController.class);  //经营品种
+	}
+
+	
+	private void addMobileRoutes(Routes me) {  // 手机端
+
+		me.add("/wx", WxController.class);    // 微信
+		me.add("/muser", MUserController.class);    // 手机端用户信息管理
+		me.add("/shop", ShopController.class);  // 店铺管理
+		me.add("/card", CardController.class);  // 商户明信片管理
+		me.add("/pro", ProduceController.class);  // 产品信息
+	}
+	
+}

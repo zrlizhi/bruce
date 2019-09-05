@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link rel="stylesheet" type="text/css" href="/bruce/theme/layui/css/layui.css">
+  <style>
+       .toplay{
+          margin:16px;
+       }
+       .subLay{
+          width:100px;
+          margin-top:16px;
+       }
+       input {
+         height:35px;
+         border-radius:5px;
+         border:0;
+         color:black;
+         padding-left:10px;
+         padding-right:10px;
+         border:1px solid #b3b2b2;
+       }
+       
+       button{
+         margin-left:20px;
+         cursor:pointer;
+       }
+	   
+    </style>
+</head>
+<body>
+ <div class="toplay">
+    <form action="/bruce/scroImg/add" method="post" enctype="multipart/form-data" >
+	    <p> 选择图片：<input type="file" name="file"/></p>
+	    <p style="margin-top:16px;">管理账号：<input type="text" id="author" name="author" readonly="readonly"/><label></label></p>
+	    <input class="subLay" type="submit" value="提交"/>
+    </form>
+ </div>
+<script src="/bruce/theme/js/jquery-1.8.3.min.js"></script>
+<script src="/bruce/theme/layer/layer.js"></script>
+<script type="text/javascript">
+var index;
+$(document).ready(function(){
+	if( 0 != localStorage.isLogin ){
+	    location.href = "/bruce/manage/login";
+	}
+
+	$("#author").val(localStorage.userName);
+});
+
+function addObj(id,vname){
+	var contentStr="<p style='height:50px;padding-left:10px;margin-top:20px;'><label style='color:black;'>种类名称：</label><input id='vname' type='text' value='"+vname+"' placeholder='输入种类名称' /></p>";
+		contentStr+="<p style='padding-left:25%;'><button type='button' class='layui-btn' onclick=addOrUpdateVar('"+id+"')>确认保存</button></p>";
+    index=layer.open({
+      type: 1,
+      area: ['400px', '200px'],
+      shadeClose: true, //点击遮罩关闭
+      content: contentStr
+    });
+}
+
+function addOrUpdateVar(id){
+	$.ajax({ 
+		url: "/bruce/var/addOrUpdateVar", 
+		dataType: 'json', 
+		data:{
+			vname:$("#vname").val(),
+			id:id,
+			author:localStorage.userName
+		},
+		success: function(result){
+			layer.msg(result.msg);
+			layer.close(index);
+			getData();		  
+        }
+	});
+}
+
+function delObj(id){
+	$.ajax({ 
+		url: "/bruce/var/deleteVarietys", 
+		dataType: 'json', 
+		data:{
+			id:id
+		},
+		success: function(result){
+			layer.msg(result.msg);
+			layer.close(index);
+			getData();
+		  
+        }
+	});
+}
+</script>
+  
+</body>
+</html>

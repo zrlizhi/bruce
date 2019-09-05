@@ -1,0 +1,31 @@
+package com.hj.app.manage.varietys.controller;
+
+import com.alibaba.fastjson.JSON;
+import com.hj.app.manage.varietys.po.VarietysPo;
+import com.hj.app.manage.varietys.service.IVarietysService;
+import com.hj.app.manage.varietys.service.imp.VarietysService;
+import com.jfinal.core.Controller;
+
+public class VarietysController extends Controller {
+
+	IVarietysService var = new VarietysService();
+	
+	public void queryVarietys(){  //查询所有经营品种
+		
+		renderJson(JSON.parseArray(var.queryVarietys()));
+	}
+	
+	public void addOrUpdateVar(){  //编辑或修改经营品种
+		
+		VarietysPo varietysPo = new VarietysPo();
+		
+		varietysPo.setId(Integer.parseInt(getPara("id")));
+		varietysPo.setVname(getPara("vname"));
+		renderJson(var.saveOrUpdateVarietys(varietysPo));
+	}
+	
+	public void deleteVarietys(){   //删除经营品种
+		
+		renderJson(var.deleteVarietys(getPara("id")));
+	}
+}

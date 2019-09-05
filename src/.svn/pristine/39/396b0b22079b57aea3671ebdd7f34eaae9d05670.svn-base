@@ -1,0 +1,105 @@
+package com.hj.app.manage.varietys.service.imp;
+
+import com.hj.app.manage.varietys.model.VarietysModel;
+import com.hj.app.manage.varietys.po.VarietysPo;
+import com.hj.app.manage.varietys.service.IVarietysService;
+import com.hj.app.model.ResultData;
+import com.jfinal.kit.JsonKit;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
+
+public class VarietysService implements IVarietysService {
+
+	@Override
+	public String queryVarietys() {
+		// TODO Auto-generated method stub
+
+		return JsonKit.toJson(Db.find("select * from varietys a "));
+	}
+
+	@Override
+	public ResultData saveOrUpdateVarietys(VarietysPo varietysPo) {
+		// TODO Auto-generated method stub
+		
+		ResultData resultData = new ResultData();
+		
+		if( null == varietysPo.getVname() || 0 == varietysPo.getVname().length()){
+			resultData.setCode(-1);
+			resultData.setMsg("参数错误！");
+			return resultData;
+		}
+		
+		try{
+			VarietysModel varietysModel = VarietysModel.dao;
+			if( 0 == varietysPo.getId()){  //判断是否是添加
+				varietysModel.set("vname", varietysPo.getVname());
+				if(varietysModel.save()){
+					resultData.setCode(0);
+					resultData.setMsg("请求成功！");
+					return resultData;
+				}
+				resultData.setCode(-1);
+				resultData.setMsg("请求失败！");
+				return resultData;
+			}
+			
+			Record varInfo = Db.findById("varietys", varietysPo.getId());  //判断信息是否存在
+			if( null == varInfo ){
+				resultData.setCode(-1);
+				resultData.setMsg("信息不存在！");
+				return resultData;
+			}
+			
+			VarietysModel varietysInfo = varietysModel.findById(varietysPo.getId());
+			varietysInfo.set("vname", varietysPo.getVname());
+			if(varietysInfo.update()){
+				resultData.setCode(0);
+				resultData.setMsg("更新成功！");
+				return resultData;
+			}
+			resultData.setCode(-1);
+			resultData.setMsg("信息不存在！");
+			return resultData;
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			resultData.setCode(-1);
+			resultData.setMsg("数据异常！");
+			return resultData;
+		}
+		
+	}
+
+	@Override
+	public ResultData deleteVarietys(String id) {
+		// TODO Auto-generated method stub
+		
+		ResultData resultData = new ResultData();
+		if(null == id || 0 == id.length()){
+			resultData.setCode(-1);
+			resultData.setMsg("参数错误！");
+			return resultData;
+		}
+		
+		try {
+			
+			if(VarietysModel.dao.deleteById(id)){
+				resultData.setCode(0);
+				resultData.setMsg("删除成功！");
+				return resultData;
+			}
+			resultData.setCode(-1);
+			resultData.setMsg("删除失败！");
+			return resultData;
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			resultData.setCode(-1);
+			resultData.setMsg("数据异常！");
+			return resultData;
+		}
+		
+	}
+
+}

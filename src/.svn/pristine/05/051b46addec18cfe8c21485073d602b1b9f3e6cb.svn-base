@@ -1,0 +1,11 @@
+package com.hj.app.mobile.merchant.shop.service;
+
+import com.hj.app.mobile.merchant.shop.po.ShopPo;
+import com.hj.app.model.ResultData;
+
+public interface IShopService {
+
+	ResultData saveOrUpdateShopMsg(ShopPo shopPo);
+	
+	ResultData queryShopInfo(String openId);
+}

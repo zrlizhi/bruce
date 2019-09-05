@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link rel="stylesheet" type="text/css" href="/bruce/theme/layui/css/layui.css">
+  <style>
+       input {
+         height:35px;
+         border-radius:5px;
+         border:0;
+         color:black;
+         padding-left:10px;
+         padding-right:10px;
+         border:1px solid #b3b2b2;
+       }
+       
+       button{
+         margin-left:20px;
+         cursor:pointer;
+       }
+	   
+    </style>
+</head>
+<body>
+ <table style="margin-top:10px;margin-bottom:10px;">
+  <tr>
+     <td style='padding-left:10px;'><button type="button" class="layui-btn" onclick="add();">&nbsp;&nbsp;添加经营品种&nbsp;&nbsp;</button></td>
+  </tr>
+ </table>
+<table class="layui-table">
+ <thead>
+   <tr>
+     <th>名称</th>
+     <th>图片</th>
+     <th>操作</th>
+  </tr>
+ </thead>
+<tbody id="listLay">
+
+</tbody>
+</table>
+<script src="/bruce/theme/js/jquery-1.8.3.min.js"></script>
+<script src="/bruce/theme/layer/layer.js"></script>
+<script type="text/javascript">
+var index;
+$(document).ready(function(){
+	if( 0 != localStorage.isLogin ){
+	    location.href = "/bruce/manage/login";
+	}
+	getData();
+});
+function getData(){
+	$.ajax({ 
+		url: "/bruce/var/queryVarietys", 
+		dataType: 'json', 
+		success: function(result){
+			var str="";
+			for(var i=0;i<result.length;i++){
+				str+="<tr>";
+				str+="<td>";
+				str+="&nbsp;&nbsp;&nbsp;"+result[i].vname+"";
+				str+="</td>";
+				str+="<td>";
+				str+="&nbsp;&nbsp;&nbsp;<img src='/bruce/upload/"+result[i].imgUrl+"' width='50px' height='50px'/>";
+				str+="</td>";
+				var stateStr="";
+				if( 0 == result[i].state){
+					stateStr = "放置到首页";
+				}else{
+					stateStr = "取消在首页";
+				}
+				str+="<td><button type='button' class='layui-btn layui-btn-normal layui-btn-sm' onclick=addObj('"+result[i].id+"')>&nbsp;&nbsp;"+stateStr+"&nbsp;&nbsp;</button>&nbsp;&nbsp;<button type='button' class='layui-btn layui-btn-warm layui-btn-sm' onclick=delObj('"+result[i].id+"')>&nbsp;&nbsp;删除&nbsp;&nbsp;</button><button type='button' class='layui-btn layui-btn-normal layui-btn-sm' onclick=editObj('"+result[i].id+"')>&nbsp;&nbsp;编辑&nbsp;&nbsp;</button>&nbsp;&nbsp;</td>"
+				str+="</tr>"
+			}
+		   $("#listLay").empty();
+           $("#listLay").append(str);
+           
+        }
+	});
+}
+
+function add(){
+	window.top.frameLay.location.href = "/bruce/manage/homeVarAdd";
+}
+function addObj(id){
+	$.ajax({ 
+		url: "/bruce/var/varState", 
+		dataType: 'json', 
+		data:{
+			id:id
+		},
+		success: function(result){
+			layer.msg(result.msg);
+			layer.close(index);
+			getData();
+		  
+        }
+	});
+}
+
+function addOrUpdateVar(id){
+	$.ajax({ 
+		url: "/bruce/var/addOrUpdateVar", 
+		dataType: 'json', 
+		data:{
+			vname:$("#vname").val(),
+			id:id
+		},
+		success: function(result){
+			layer.msg(result.msg);
+			layer.close(index);
+			getData();
+		  
+        }
+	});
+}
+
+function delObj(id){
+	$.ajax({ 
+		url: "/bruce/var/deleteVarietys", 
+		dataType: 'json', 
+		data:{
+			id:id
+		},
+		success: function(result){
+			layer.msg(result.msg);
+			layer.close(index);
+			getData();
+		  
+        }
+	});
+}
+
+function editObj(id){
+	openEditDetail("经营品种编辑", ['900px', '700px'], "/bruce/manage/varietysChildEdit?varId="+id, "ApplicationSave", function() {alert("执行完了");});
+}
+
+function openEditDetail(title, area, path, sucFunName, callBack) {
+    layer.open({
+        type: 2,
+        title: title, //不显示标题栏
+        closeBtn: 2,
+        area: area,
+        shade: 0.2,
+        id: (new Date()).valueOf(), //设定一个id，防止重复弹出 时间戳1280977330748
+       /*  btn: ['保存', '取消'],  */
+        btnAlign: 'r',
+        moveType: 1, //拖拽模式，0或者1
+        content: path,
+        shadeClose: true //点击遮罩关闭
+    });
+}
+</script>
+  
+</body>
+</html>

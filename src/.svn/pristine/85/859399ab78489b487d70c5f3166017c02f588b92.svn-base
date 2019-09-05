@@ -1,0 +1,13 @@
+package com.hj.app.manage.varietys.service;
+
+import com.hj.app.manage.varietys.po.VarietysPo;
+import com.hj.app.model.ResultData;
+
+public interface IVarietysService {
+
+     String queryVarietys();
+     
+     ResultData saveOrUpdateVarietys(VarietysPo varietysPo);
+     
+     ResultData deleteVarietys(String id);
+}

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,minimum-scale=1.0,user-scalable=0" />
+		<title>福人年会座位查询系统</title>
+		<link rel="stylesheet" href="/bruce/theme/layui/css/layui.css">
+		<style>
+		   body{
+				background-color: #ffffff;
+			}
+			
+			ul{
+				margin: 0;
+				padding:0;
+				margin-top: 16px;
+			}
+			
+			ul li{
+				
+				list-style: none;
+				height:25px;
+				
+			}
+			
+			.setCenter{
+				text-align: center;
+			}
+			
+			.mainLay{
+				text-align: center;
+				padding-top:10vw;
+			}
+			
+			input{
+				
+				height: 35px;
+				width:80vw;
+				text-align: center;
+			}
+			
+			button{
+				width:120px;
+				height:40px;
+				background-color: #A42524;
+				border:0px;
+				color: white;
+				cursor: pointer;
+				margin-top: 16px;
+				border-radius:5px
+			}
+			.header{
+				color: #A42524;
+				height:40px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="mainLay">
+		    <p class="setCenter"><img src="/bruce/theme/img/logo2.png" width="100px" height="100px"/></p>
+		    <br>
+			<p class="setCenter"><h3 style="color: #A42524;">福人集团晚宴座位查询系统</h3></p>
+			<br>
+			<p><input name="content" id="contentLay" placeholder="请输入名字"/></p>
+			<p><button onclick="searchObj()" id="btnLay">点击查询</button></p>
+			
+			<ul id="searchLay" style="display: none;">
+				<li class="header"><h3>位置信息</h3></li>
+				<li id="snameLay"></li>
+				<li id="snoLay"></li>
+				<li id="leaderLay"></li>
+				<li id="telLay"></li>
+			</ul>
+			
+			<ul id="seatLay" style="display: none;">
+				<li class="header"><h3>负责人信息</h3></li>
+				<li>于琼：<a href="tel:18621895650">18621895650</a></li>
+				<li>多多：<a href="tel:18116218816">18116218816</a></li>
+				<li style="height:30px;">&nbsp;</li>
+			</ul>
+			
+		</div>
+		<p style="margin-top:20px;text-align:center;height:30px;"><label style="color:blue;font-size:15px;" onclick="cardObj();">晚会节目单</labe></p>
+		<p style="margin-bottom:20px;text-align:center;height:30px;"><label onclick="contactObj();" style="color:blue;font-size:15px;">联系负责人</labe></p>
+		<script src="/bruce/theme/layui/layui.js"></script>
+		<script src="/bruce/theme/layer/layer.js"></script>
+		<script src="/bruce/theme/js/jquery-1.8.3.min.js"></script>
+		<script>
+			
+			function searchObj(){
+
+				var content=$("#contentLay").val();
+		 		if( 0 == content.length ){
+		 			alert("请输入姓名");
+		 			return;
+		 		}
+
+		 		$("#btnLay").text("请稍等...");
+		 		$("#btnLay").attr('disabled','true');
+		 		
+		 		
+		 		$.ajax({ 
+		 			url: "/bruce/seat/search", 
+		 			dataType: 'json',
+		 			data:{
+		 				content:content,
+		 			},
+		 			success: function(result){
+
+		 				$("#btnLay").text("点击查询");
+		 				$("#btnLay").removeAttr('disabled');
+		 				
+		 				if( -1 == result.code){
+		 					$("#searchLay").hide();
+		 					alert(result.msg);
+                            return;
+			 			}
+
+			 			if( -2 == result.code){
+			 				alert(result.msg);
+			 				$("#searchLay").hide();
+			 				$("#seatLay").show();
+                            return;
+			 				
+				 		}
+
+			 			$("#searchLay").show();
+			 			$("#snameLay").html(result.resultData.sname);
+			 			$("#snoLay").html(result.resultData.sno);
+			 			$("#leaderLay").html("桌长："+result.resultData.leader);
+			 			if(0 != result.resultData.tel.length){
+			 				$("#telLay").html("联系桌长：<a href=tel:"+result.resultData.tel+">"+result.resultData.tel+"</a>");
+				 		}
+			 			
+		 	        }
+		 		});
+				
+			}
+			
+			function contactObj(){
+				$("#seatLay").toggle();
+			}
+
+			function cardObj(){
+               location.href="/bruce/seat/card.html";
+			}
+					
+		</script>
+	</body>
+</html>

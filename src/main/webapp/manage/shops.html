@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" type="text/css" href="/bruce/theme/layui/css/layui.css" media="all">
+<style>
+  p{
+    width:90%;
+    margin:10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="demoTable" style="margin:5px;">
+  <div class="layui-inline">
+    <input class="layui-input" name="shopName" id="shopName" autocomplete="off" placeholder="输入店铺名称...">
+  </div>
+  <button class="layui-btn" data-type="reload">搜索</button>
+  <button class="layui-btn" data-type="getCheckData" style="display:none;">获取选中行数据</button>
+</div>
+<table class="layui-table" id="LAY_table_shop"  lay-filter="demo"></table>
+ 
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-normal layui-btn-sm" lay-event="detail">查看</a>
+  <a class="layui-btn layui-btn-sm" lay-event="edit">发消息</a>
+</script>
+<script src="/bruce/theme/layui/layui.js"></script>
+<script src="/bruce/theme/layer/layer.js"></script>
+<script src="/bruce/theme/js/jquery-1.8.3.min.js"></script>
+<script>
+if( 0 != localStorage.isLogin ){
+    location.href = "/bruce/manage/login";
+}
+layui.use('table', function(){
+  var table = layui.table;
+
+  //方法级渲染
+  table.render({
+    elem: '#LAY_table_shop'
+    ,url: '/bruce/shop/shopListForManage'
+    ,cellMinWidth: 80
+    ,cols: [[
+      {checkbox: true, fixed: true,hide:true }
+      ,{field:'id', title: 'ID', sort: true,hide:true}
+      ,{field:'shopnum', title: '商户编号', sort: true}
+      ,{field:'shop_name', title: '店铺名称'}
+      ,{field:'contact_name', title: '联系人', sort: true}
+      ,{field:'contact_tel', title: '联系电话'}
+      ,{field:'shop_addr', title: '地址'}
+      ,{field:'variety', title: '经营品种', sort: true}
+      ,{field:'views', title: '浏览数', sort: true}
+      ,{field:'collects', title: '收藏数'}
+      ,{field:'addDate', title: '注册日期', sort: true}
+      ,{fixed: 'right', align:'center', toolbar: '#barDemo'}
+    ]]
+    ,id: 'shopReload'
+    ,page: true
+  });
+  
+  //监听表格复选框选择
+  table.on('checkbox(demo)', function(obj){
+    console.log(obj)
+  });
+  //监听工具条
+  table.on('tool(demo)', function(obj){
+    var data = obj.data;
+    if(obj.event === 'detail'){
+      //layer.msg('ID：'+ data.id + ' 的查看操作');
+    	window.top.frameLay.location.href = "/bruce/shop/queryShopInfoForManage?openId="+data.id+"&state=0";
+    } else if(obj.event === 'edit'){
+
+    	window.top.frameLay.location.href = "/bruce/manage/addNotice?openId="+data.id+"&shopName="+data.shop_name;
+    	
+    	//var StrCtn = "<p>商户："+data.shop_name+"</p>";
+    	//StrCtn +="<p><textarea id='contentLay' placeholder='请输入消息内容' class='layui-textarea'></textarea></p>";
+    	//StrCtn +="<p style='text-align:center;'><button class='layui-btn' onclick=sendMsgObj('"+data.id+"');>确认发送</button></p>";
+        
+	   	//layer.open({
+		//   	  title:'发送消息',
+	   	//	  type: 1,
+	   	//	  area: ['420px', '300px'], //宽高
+	   	//	  content: StrCtn
+	   	//	});
+    } 
+  });
+  
+  var $ = layui.$, active = {
+    getCheckData: function(){ //获取选中数据
+      var checkStatus = table.checkStatus('shopReload')
+      ,data = checkStatus.data;
+      layer.alert(JSON.stringify(data));
+    },reload: function(){
+        var shopName = $('#shopName');
+        //执行重载
+        table.reload('shopReload', {
+          page: {
+            curr: 1 //重新从第 1 页开始
+          }
+          ,where: {
+            //key: {
+               shopName: shopName.val()
+            //}
+          }
+        });
+    }
+  
+  };
+  
+  $('.demoTable .layui-btn').on('click', function(){
+    var type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+  });
+});
+
+function sendMsgObj(openid){
+
+    if(0 == $("#contentLay").val().length){
+        alert("输入内容");
+        return;
+    }
+    $.ajax({ 
+		url: "/bruce/notice/add", 
+		dataType: 'json', 
+		data:{
+			openId:openid,
+			content:$("#contentLay").val()
+		},
+		success: function(result){
+			layer.msg(result.msg);
+        }
+	});
+}
+</script>
+  
+</body>
+</html>

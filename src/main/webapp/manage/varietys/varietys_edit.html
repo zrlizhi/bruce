@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" type="text/css" href="/bruce/theme/layui/css/layui.css" media="all">
+<style>
+  p{
+    width:90%;
+    margin:10px;
+  }
+</style>
+</head>
+<body>
+
+<div class="demoTable" style="margin:5px;">
+ <!--  <div class="layui-inline">
+    <input class="layui-input" name="content" id="order_id" autocomplete="off" placeholder="输入产品名称...">
+  </div> -->
+  <!-- <button class="layui-btn" data-type="reload">搜索</button> -->
+  <button class="layui-btn" data-type="addSecondVars">添加</button>
+  <button class="layui-btn" data-type="getCheckData" style="display:none;">获取选中行数据</button>
+</div>
+<input type="hidden" id ="varId" value="#(varId)">
+
+<table class="layui-table" id="LAY_table_vars"  lay-filter="demo"></table>
+
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+  <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script src="/bruce/theme/layui/layui.js"></script>
+<!-- <script src="/bruce/theme/layer/layer.js"></script> -->
+<script src="/bruce/theme/js/jquery-1.8.3.min.js"></script>
+  <!-- <script src="../../../layuiadmin/layui/layui.js"></script>   -->
+  <script>
+  var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+  console.log("varietys_edit.html,iframeIndex:"+index)
+  if( 0 != localStorage.isLogin ){
+	    location.href = "/bruce/manage/login";
+	}
+  var parentId = $('#varId').val();
+	layui.use('table', function(){
+	  var table = layui.table;
+	  
+
+	  //方法级渲染
+	  table.render({
+	    elem: '#LAY_table_vars'
+	    ,url: '/bruce/var/queryChildVarsList?parentId='+parentId
+	    ,cellMinWidth: 80
+	    ,cols: [[
+	      {checkbox: true, fixed: true,hide:true }
+	      ,{field:'id', title: 'ID', sort: true,hide:true}
+	      ,{field:'vname', title: '名称', sort:true}
+	      ,{field:'imgUrl', title: '图片',sort:false,
+	    	  templet:function (d) { return '<div><img src=/bruce/upload/'+d.imgUrl+' width=50px height=50px></div>' }
+	      }
+	      ,{fixed: 'right', align:'center', toolbar: '#barDemo'}
+	    ]]
+	    ,id: 'ordersReload'
+	    ,page: true
+	  });
+	  
+	  //监听表格复选框选择
+	  table.on('checkbox(demo)', function(obj){
+	    console.log(obj)
+	  });
+	  
+	  table.on('tool(demo)',function(obj){
+		  var data = obj.data;
+		    if(obj.event === 'detail'){
+		      layer.msg('ID：'+ data.id + ' 的查看操作');
+		    } else if(obj.event === 'del'){
+		      layer.confirm('真的删除行么', function(index){
+		        /* obj.del();
+		        layer.close(index); */
+		    	  delVarDetail(data.id);
+		      });
+		    } else if(obj.event === 'edit'){
+		    	//JSON.stringify(data)
+		       /* layer.alert('编辑行：<br>'+ data.orders_id);  */
+		          /* layer.open({
+		            type: 2
+		            ,title: '添加文章'
+		            ,content: 'listform.html'
+		            ,maxmin: true
+		            ,area: ['550px', '550px']
+		            ,btn: ['确定', '取消']
+		            ,yes: function(index, layero){
+		              //点击确认触发 iframe 内容中的按钮提交
+		              var submit = layero.find('iframe').contents().find("#layuiadmin-app-form-submit");
+		              submit.click();
+		            }
+		          });  */
+		    	openEditDetail("编辑", ['700px', '600px'], "/bruce/manage/varietysChildDetailEdit?varId="+data.id+"&parentId="+parentId, "ApplicationSave", function() {console.log("varietys_edit.html：执行完了")}); 
+		    }
+		           
+	  })
+	  
+	  var $ = layui.$, active = {
+	    getCheckData: function(){ //获取选中数据
+	      var checkStatus = table.checkStatus('ordersReload')
+	      ,data = checkStatus.data;
+	     layer.alert(JSON.stringify(data));
+	    }
+	  	,addSecondVars:function(){
+	  		 openEditDetail("添加", ['700px', '600px'], "/bruce/manage/varietysChildDetailEdit?parentId="+parentId, "ApplicationSave", function() {console.log("varietys_edit.html:执行完了");}); 
+	    }
+	    ,reload: function(){
+	        var order_id = $('#order_id');
+	        //执行重载
+	        table.reload('ordersReload', {
+	          page: {
+	            curr: 1 //重新从第 1 页开始
+	          }
+	          ,where: {
+	            //key: {
+	               content: order_id.val()
+	            //}
+	          }
+	        });
+	    }
+	  
+	  };
+	  
+	  $('.demoTable .layui-btn').on('click', function(){
+	    var type = $(this).data('type');
+	    active[type] ? active[type].call(this) : '';
+	  });
+	});
+
+	function delVarDetail(id){
+		$.ajax({ 
+			url: "/bruce/var/deleteVarDetails", 
+			dataType: 'json', 
+			data:{
+				varId:id
+			},
+			success: function(result){
+				layer.msg(result.msg);
+				layer.close(index);
+				
+			  
+	        }
+		});	
+	}
+	function openEditDetail(title, area, path, sucFunName, callBack) {
+		parent.layer.open({
+	        type: 2,
+	        title: title, //不显示标题栏
+	        closeBtn: 2,
+	        area: area,
+	        shade: 0.2,
+	        id: (new Date()).valueOf(), //设定一个id，防止重复弹出 时间戳1280977330748
+	       /*  btn: ['保存', '取消'],  */
+	        btnAlign: 'r',
+	        moveType: 1, //拖拽模式，0或者1
+	        content: path,
+	        shadeClose: true //点击遮罩关闭
+	    });
+	}
+  
+  </script>
+</body>
+</html>

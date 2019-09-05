@@ -1,0 +1,145 @@
+package com.hj.app.mobile.merchant.produce.service.imp;
+
+import com.hj.app.mobile.merchant.produce.model.ProduceModel;
+import com.hj.app.mobile.merchant.produce.po.ProducePo;
+import com.hj.app.mobile.merchant.produce.service.IProduceService;
+import com.hj.app.model.ResultData;
+import com.hj.app.utils.DateUtil;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
+
+public class ProduceService implements IProduceService {
+
+	@Override
+	public ResultData saveOrUpdateProduce(ProducePo producePo) {  //添加或编辑产品信息
+		// TODO Auto-generated method stub
+
+		ResultData resultData = new ResultData();
+
+		if (null == producePo.getOpenid() || 0 == producePo.getOpenid().length() || null == producePo.getPro_name()
+				|| 0 == producePo.getPro_name().length()) { // 验证参数
+			resultData.setCode(-1);
+			resultData.setMsg("参数错误！");
+			return resultData;
+		}
+
+		if (null == producePo.getId() || 0 == producePo.getId().length()) { // 判断是否重复提交
+
+			return saveProduceHandle(resultData, producePo);  //添加产品
+
+		}
+
+		Record shopInfo = Db.findFirst(
+				"select * from produce a where a.id = '"+producePo.getId()+"' and a.openid='"+producePo.getOpenid()+"'"); // 校验是否存在重复信息
+		if (null != shopInfo) {
+			return updateProduceHandle(resultData, producePo); //编辑产品
+		}
+		resultData.setCode(-1);
+		resultData.setMsg("信息错误！");
+		return resultData;
+	}
+
+	private ResultData saveProduceHandle(ResultData resultData, ProducePo producePo) { // 保存产品信息
+
+		ProduceModel produceModel = ProduceModel.dao;
+
+		String idStr = DateUtil.dateStr(); // 生成产品ID
+		produceModel.set("id", idStr);
+		produceModel.set("openid", producePo.getOpenid());
+		produceModel.set("pro_name", producePo.getPro_name());
+		produceModel.set("level", producePo.getLevel());
+		produceModel.set("place", producePo.getPlace());
+		produceModel.set("spec", producePo.getSpec());
+		produceModel.set("classify", producePo.getClassify());
+		produceModel.set("pro_img", producePo.getPro_img());
+		produceModel.set("addDate", DateUtil.getTimeStamp());
+
+		try {
+			if (produceModel.save()) {
+				resultData.setCode(0);
+				resultData.setMsg("请求成功！");
+				resultData.setResultData(idStr);
+				return resultData;
+			}
+			resultData.setCode(-1);
+			resultData.setMsg("请求失败！");
+			return resultData;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			resultData.setCode(-1);
+			resultData.setMsg("数据异常！");
+			return resultData;
+		}
+
+	}
+
+	private ResultData updateProduceHandle(ResultData resultData, ProducePo producePo) { // 编辑产品信息
+
+		ProduceModel produceModel = ProduceModel.dao.findFirst(
+				"select * from produce a where a.id = '"+producePo.getId()+"' and a.openid='"+producePo.getOpenid()+"'"); // 查询产品信息
+		produceModel.set("pro_name", producePo.getPro_name());
+		produceModel.set("level", producePo.getLevel());
+		produceModel.set("place", producePo.getPlace());
+		produceModel.set("spec", producePo.getSpec());
+		produceModel.set("classify", producePo.getClassify());
+		produceModel.set("pro_img", producePo.getPro_img());
+
+		try {
+			if (produceModel.update()) {
+				resultData.setCode(0);
+				resultData.setMsg("请求成功！");
+				resultData.setResultData(produceModel.getStr("id"));
+				return resultData;
+			}
+			resultData.setCode(-1);
+			resultData.setMsg("请求失败！");
+			return resultData;
+		} catch (Exception e) {
+			// TODO: handle exception
+			resultData.setCode(-1);
+			resultData.setMsg("数据异常！");
+			return resultData;
+		}
+
+	}
+
+	@Override
+	public ResultData deleteProduce(String id, String openid) { // 删除产品信息
+		// TODO Auto-generated method stub
+
+		ResultData resultData = new ResultData();
+
+		if (null == id || 0 == id.length() || null == openid || 0 == openid.length()) { // 检验参数
+			resultData.setCode(-1);
+			resultData.setMsg("参数错误！");
+			return resultData;
+		}
+
+		ProduceModel produceModel = ProduceModel.dao
+				.findFirst("select * from produce a where a.id = '"+id+"' and a.openid='"+openid+"'"); // 查询产品信息
+		if (null == produceModel) {
+			resultData.setCode(-1);
+			resultData.setMsg("信息不存在！");
+			return resultData;
+		}
+
+		try {
+			if (produceModel.delete()) {
+				resultData.setCode(0);
+				resultData.setMsg("删除成功！");
+				return resultData;
+			}
+			resultData.setCode(-1);
+			resultData.setMsg("删除失败！");
+			return resultData;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			resultData.setCode(-1);
+			resultData.setMsg("数据异常！");
+			return resultData;
+		}
+	}
+
+}

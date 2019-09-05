@@ -1,0 +1,16 @@
+package com.hj.app.manage.index;
+
+import com.jfinal.core.Controller;
+
+public class ManageController extends Controller {
+
+	public void index(){
+		
+		render("/manage/index.html");
+	}
+	
+    public void varietys(){
+		
+		render("/manage/varietys.html");
+	}
+}

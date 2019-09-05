@@ -1,0 +1,11 @@
+package com.hj.app.mobile.merchant.produce.service;
+
+import com.hj.app.mobile.merchant.produce.po.ProducePo;
+import com.hj.app.model.ResultData;
+
+public interface IProduceService {
+
+	ResultData saveOrUpdateProduce(ProducePo producePo);
+	
+	ResultData deleteProduce(String id,String openid);
+}

@@ -1,0 +1,152 @@
+package com.hj.app.mobile.users.service.impl;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.hj.app.mobile.merchant.card.service.ICardService;
+import com.hj.app.mobile.merchant.card.service.imp.CardService;
+import com.hj.app.mobile.users.model.MUserModel;
+import com.hj.app.mobile.users.po.UserPo;
+import com.hj.app.mobile.users.service.IMUserService;
+import com.hj.app.model.ResultData;
+import com.hj.app.utils.DateUtil;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
+
+/**
+ * 
+ * @author xuhj 手机端用户管理
+ *
+ */
+public class MUserService implements IMUserService {
+
+	private ICardService cardService = new CardService(); //商户明信片
+	
+	/**
+	 * 根据openid查询用户信息
+	 * 
+	 * @param openId
+	 *            用户opneid
+	 */
+	@Override
+	public ResultData queryUserInfoByOpenId(String openId) {
+		// TODO Auto-generated method stub
+
+		ResultData resultData = new ResultData();// 初始化请求结果
+
+		if (null == openId) {
+
+			Record userInfo = Db.findFirst("select * from app_user a where a.openid = '"+openId+"'");
+			if (null == userInfo) {// 是否有用户信息
+
+				resultData.setCode(-10);
+				resultData.setMsg("未注册");
+
+				return resultData;
+
+			} else {
+
+				resultData.setCode(0);
+				resultData.setMsg("请求成功！");
+				resultData.setResultData(userInfo);
+
+				return resultData;
+			}
+
+		} else {
+
+			resultData.setCode(-11);
+			resultData.setMsg("参数错误");
+
+			return resultData;
+		}
+
+	}
+
+	/**
+	 * 保存用户信息
+	 * 
+	 * @param params
+	 * 用户信息
+	 */
+	@Override
+	public ResultData saveUsers(UserPo params) {
+		// TODO Auto-generated method stub
+
+		ResultData resultData = new ResultData();// 初始化请求结果
+
+		if (null == params.getOpenid() || 0 == params.getOpenid().length()  || null == params.getUsername() || 0 == params.getUsername().length()
+				|| null == params.getUser_icon() || 0 == params.getUser_icon().length()) {// 验证参数
+
+			resultData.setCode(-11);
+			resultData.setMsg("参数错误");
+
+			return resultData;
+
+		}
+
+		try {
+
+			Record userInfo = Db
+					.findFirst("select a.id,a.username,a.user_icon from app_user a where a.id = '"+params.getOpenid()+"'");
+
+			Map<String,Object> map = new HashMap<String,Object>();
+			
+			Record cardInfo = Db.findFirst("select * from mer_card a where a.id = '"+params.getOpenid()+"'");
+			
+			if( null == cardInfo){
+				map.put("isCard", -1);
+			}else{
+				map.put("isCard", 0);
+				map.put("cardInfo", cardInfo);
+			}
+			
+			if (null != userInfo) {
+
+				resultData.setCode(0);
+				resultData.setMsg("请求成功");
+				map.put("userInfo", userInfo);
+				resultData.setResultData(map);
+
+				return resultData;
+			}
+
+			MUserModel userModel = MUserModel.dao;// 初始化用户MODEL
+			userModel.set("id", params.getOpenid());// 用户OPENID
+			userModel.set("username", params.getUsername());// 用户名
+			userModel.set("gender", params.getGender());// 性别
+			userModel.set("user_icon", params.getUser_icon());// 头像
+			userModel.set("city", params.getCity());// 用户所在城市
+			userModel.set("province", params.getProvince());// 用户所在省份
+			userModel.set("addDate", DateUtil.getTimeStamp());
+
+			if(userModel.save()){
+				resultData.setCode(0);
+				resultData.setMsg("请求成功");
+				map.put("userInfo", userInfo);
+				resultData.setResultData(map);
+				return resultData;
+			}
+
+			resultData.setCode(-1);
+			resultData.setMsg("请求失败");
+			return resultData;
+			
+
+		} catch (Exception e) {
+			// TODO: handle exception
+            e.printStackTrace();
+			resultData.setCode(-2);
+			resultData.setMsg("数据异常");
+			return resultData;
+		}
+
+	}
+
+	@Override
+	public UserPo getUserInfo(String openId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}
