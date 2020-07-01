@@ -46,7 +46,7 @@
 <pinyin4j.version>2.5.0</pinyin4j.version>
 <poi.version>3.17</poi.version>
 <prettytime.version>4.0.2.Final</prettytime.version>
-<quartz.version>2.3.0</quartz.version>
+<quartz.version>2.3.2</quartz.version>
 <shiro.version>1.4.0</shiro.version>
 <thumbnailator.version>0.4.8</thumbnailator.version>
 <zxing.version>3.2.1</zxing.version>
