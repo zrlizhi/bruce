@@ -16,7 +16,7 @@
     <jfinaljetty.version>8.1.8</jfinaljetty.version>
 	<druid.version>1.1.10</druid.version>
 	 <fastjson.version>1.2.47</fastjson.version>
-	<mysql.version>5.1.46</mysql.version>
+	<mysql.version>8.0.16</mysql.version>
 <activation.version>1.1</activation.version>
 <javassist.version>3.21.0-GA</javassist.version>
 <commonscodec.version>1.11</commonscodec.version>
